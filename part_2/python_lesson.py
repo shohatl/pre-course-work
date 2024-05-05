@@ -1,5 +1,7 @@
+import mpmath
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
+
 
 def num_len(num: int) -> int:
     return num_len(num=int(num / 10)) + 1 if num > 10 else 1
@@ -61,5 +63,6 @@ def question_4():
     print("the pearson correlation coefficient is: ", pearson_corr)
 
 
-if __name__ == '__main__':
-    question_4()
+def reverse_n_pi_digits(n: int) -> str:
+    mpmath.mp.dps = n
+    return str(mpmath.pi / 10)[2:][::-1]
