@@ -14,5 +14,20 @@ def pythagorean_triplet_by_sum(sum: int):
                 print("<".join(map(str, nums)))
 
 
+def is_sorted_polyndrom(string: str) -> bool:
+    if string != string[::-1]:
+        return False
+    x = len(string)
+    x = int(x / 2) + x % 2
+    string = string.lower()
+    last = ord(string[0])
+    for char in string[1:x]:
+        if ord(char) >= last:
+            last = ord(char)
+        else:
+            return False
+    return True
+
+
 if __name__ == '__main__':
-    pythagorean_triplet_by_sum(0)
+    print(is_sorted_polyndrom("lbcdgdcbl"))
