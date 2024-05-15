@@ -28,13 +28,19 @@ namespace _2048{
             //     this.AddPiece();
             // }
             this.Data = new int[4,4];
-            for(int i = 0; i < 4; i++)
-            {
-                this.Data[i,3] = 2;
-            }
+            this.Data = new int[,]{
+                {2,4,2,4},
+                {4,2,4,2},
+                {2,4,2,4},
+                {4,2,4,2}
+            };
+            // for(int i = 0; i < 4; i++)
+            // {
+            //     this.Data[i,3] = 2;
+            // }
 
-            this.Data[1,2] = 4;
-            this.Data[1,0] = 2;
+            // this.Data[1,2] = 4;
+            // this.Data[1,0] = 2;
         }
 
         public int[,] GetData()
@@ -175,7 +181,7 @@ namespace _2048{
                     break;
                 
                 case Direction.Right:
-                    for (int y = 0; y < this.Data.GetLength(0); y++)
+                    for (int y = 0; y < this.Data.GetLength(1); y++)
                     {
                         List<int> pieces = this.GetRowPieces(y);
 
@@ -207,7 +213,7 @@ namespace _2048{
                     break;
 
                 case Direction.Left:
-                    for (int y = 0; y < this.Data.GetLength(0); y++)
+                    for (int y = 0; y < this.Data.GetLength(1); y++)
                     {
                         List<int> pieces = this.GetRowPieces(y);
 
@@ -241,16 +247,95 @@ namespace _2048{
             this.AddPiece();
             return points;
         }
+
+        public int GetHighestPiece()
+        {
+            int max = 0;
+            for (int x = 0; x < this.Data.GetLength(0); x++)
+            {
+                for (int y = 0; y < this.Data.GetLength(1); y++)
+                {
+                    if (this.Data[x, y] > max)
+                    {
+                        max = this.Data[x, y];
+                    }
+                }
+            }
+            return max;
+        }
+
+        public bool PossibleMove()
+        {
+            for (int x = 0; x < this.Data.GetLength(0); x++)
+            {
+
+                for (int y = 0; y < this.Data.GetLength(1); y++)
+                {
+                    if (this.Data[x, y] == 0)
+                    {
+                        return true;
+                    }
+                    if (x < this.Data.GetLength(0) - 1 && this.Data[x, y] == this.Data[x + 1, y])
+                    {
+                    return true;
+                    }
+
+                    if  (y < this.Data.GetLength(1) - 1 && this.Data[x, y] == this.Data[x, y + 1])
+                    {
+                    return true;
+                    }
+                }
+            }
+            return false;
+        }
         
+    }
+
+    public class Game
+    {
+        protected Board Board;
+        protected GameStatus GameStatus;
+        public int Points {protected set; get;}
+
+        public Game()
+        {
+            this.Board = new Board();
+            this.GameStatus = GameStatus.Idle;
+            this.Points = 0;
+        }
+        public void Move(Direction direction)
+        {
+            if (this.GameStatus == GameStatus.Lose){
+                return;
+            }
+            else if (GameStatus == GameStatus.Idle)
+            {
+                if (!this.Board.PossibleMove())
+                {
+                    this.GameStatus = GameStatus.Lose;
+                    return;
+                }
+                this.Points += this.Board.Move(direction);
+            }
+            if (this.Board.GetHighestPiece() == 2048)
+            {
+                this.GameStatus = GameStatus.Win;
+            }
+        }
+
+        public int[,] GetBoardData()
+        {
+            return this.Board.GetData();
+        }
     }
     public class Program
     {
         public static void Main()
         {
-            Board test = new Board();
-            Console.WriteLine(ArrayToString(test.GetData()));
-            Console.WriteLine($"got {test.Move(Direction.Right)} points");
-            Console.WriteLine(ArrayToString(test.GetData()));
+            Game test = new Game();
+            Console.WriteLine(ArrayToString(test.GetBoardData()));
+            test.Move(Direction.Right);
+            Console.WriteLine(ArrayToString(test.GetBoardData()));
         }
         
         private static string ArrayToString(int[,] array)
