@@ -1,5 +1,6 @@
 using System;
 using System.Reflection.Metadata;
+using _2048;
 
 namespace _2048{
     public enum Direction
@@ -23,24 +24,17 @@ namespace _2048{
 
         public Board()
         {
-            // for(int i = 0; i < 2; i++)
-            // {
-            //     this.AddPiece();
-            // }
             this.Data = new int[4,4];
             this.Data = new int[,]{
-                {2,4,2,4},
-                {4,2,4,2},
-                {2,4,2,4},
-                {4,2,4,2}
+                {0,0,0,0},
+                {0,0,0,0},
+                {8,4,2,2},
+                {0,0,0,0}
             };
-            // for(int i = 0; i < 4; i++)
+            // for(int i = 0; i < 2; i++)
             // {
-            //     this.Data[i,3] = 2;
+                // this.AddPiece();
             // }
-
-            // this.Data[1,2] = 4;
-            // this.Data[1,0] = 2;
         }
 
         public int[,] GetData()
@@ -164,7 +158,7 @@ namespace _2048{
                             }
                             tempY++;
                         }
-
+                        pieces.Reverse();
                         for (int y = 0; y < this.Data.GetLength(1); y++)
                         {
                             if (y < pieces.Count)
@@ -196,7 +190,7 @@ namespace _2048{
                             }
                             tempX++;
                         }
-
+                        pieces.Reverse();
                         for (int x = 0; x < this.Data.GetLength(0); x++)
                         {
                             if (x < pieces.Count)
@@ -310,16 +304,15 @@ namespace _2048{
             }
             else if (GameStatus == GameStatus.Idle)
             {
-                if (!this.Board.PossibleMove())
-                {
-                    this.GameStatus = GameStatus.Lose;
-                    return;
-                }
                 this.Points += this.Board.Move(direction);
             }
             if (this.Board.GetHighestPiece() == 2048)
             {
                 this.GameStatus = GameStatus.Win;
+            }
+            else if (!this.Board.PossibleMove())
+            {
+                this.GameStatus = GameStatus.Lose;
             }
         }
 
@@ -327,17 +320,45 @@ namespace _2048{
         {
             return this.Board.GetData();
         }
-    }
-    public class Program
-    {
-        public static void Main()
+
+        public GameStatus GetStatus()
         {
-            Game test = new Game();
-            Console.WriteLine(ArrayToString(test.GetBoardData()));
-            test.Move(Direction.Right);
-            Console.WriteLine(ArrayToString(test.GetBoardData()));
+            return this.GameStatus;
         }
-        
+    }
+
+    public class ConsoleGame
+    {
+        public static Direction GetInput()
+        {
+            Console.WriteLine("Input direction");
+            while (true)
+            {
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+                char input = keyInfo.KeyChar;
+                if (input == 'w' || input == 38)
+                {
+                    return Direction.Up;
+                }
+                else if (input == 's' || input == 40)
+                {
+                    return Direction.Down;
+                }
+                else if (input == 'a' || input == 37)
+                {
+                    return Direction.Left;
+                }
+                else if (input == 'd' || input == 39)
+                {
+                    return Direction.Right;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Input");
+                }
+            }
+        }
+
         private static string ArrayToString(int[,] array)
         {
             string result = "";
@@ -352,6 +373,34 @@ namespace _2048{
             }
 
             return result;
+        }
+
+        public static void ShowGame(Game game)
+        {
+            Console.WriteLine($"Points scored: {game.Points}");
+            Console.WriteLine(ArrayToString(game.GetBoardData()));
+            if (game.GetStatus() == GameStatus.Win)
+            {
+                Console.WriteLine("You Won");
+            }
+            else if (game.GetStatus() == GameStatus.Lose)
+            {
+                Console.WriteLine("You Lost");
+            }
+
+        }
+    }
+    public class Program
+    {
+        public static void Main()
+        {
+            Game game = new Game();
+            while (game.GetStatus() == GameStatus.Idle)
+            {
+                ConsoleGame.ShowGame(game);
+                game.Move(ConsoleGame.GetInput());
+            }
+            ConsoleGame.ShowGame(game);
         }
     }
 }
