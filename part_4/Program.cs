@@ -336,19 +336,19 @@ namespace _2048{
             {
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
                 char input = keyInfo.KeyChar;
-                if (input == 'w' || input == 38)
+                if (input == 'w')
                 {
                     return Direction.Up;
                 }
-                else if (input == 's' || input == 40)
+                else if (input == 's')
                 {
                     return Direction.Down;
                 }
-                else if (input == 'a' || input == 37)
+                else if (input == 'a')
                 {
                     return Direction.Left;
                 }
-                else if (input == 'd' || input == 39)
+                else if (input == 'd')
                 {
                     return Direction.Right;
                 }
@@ -362,15 +362,49 @@ namespace _2048{
         private static string ArrayToString(int[,] array)
         {
             string result = "";
-
+            int lengthX = 6;
+            int lengthY = 3;
+            string fillerY = "";
+            for (int i = 0; i < (lengthY - 1) / 2; i++)
+                {
+                    fillerY += "\n";
+                    for (int z = 0; z < 5; z++)
+                    {
+                        fillerY += "|";
+                        for (int temp = 0; temp < lengthX; temp++)
+                        {
+                            fillerY += " ";
+                        }
+                    }
+                    fillerY += "\n";
+                }
             for (int y = 0; y < array.GetLength(1); y++)
             {
+                for (int i = 0; i < lengthX * 4 + 5; i++)
+                {
+                    result += "_";
+                }
+                result += fillerY + "|";
                 for (int x = 0; x < array.GetLength(0); x++)
                 {
-                    result += array[x, y] + " ";
+                    string fillerX = "";
+                    for (int temp = 0; temp < (lengthX - array[x, y].ToString().Length) / 2; temp++)
+                    {
+                        fillerX += " ";
+                    }
+                    result += fillerX + array[x, y] + fillerX;
+                    if ((lengthX - array[x, y].ToString().Length) % 2 == 1)
+                    {
+                        result += " ";
+                    }
+                    result += "|";
                 }
-                result += "\n";
+                result += fillerY;
             }
+            for (int i = 0; i < lengthX * 4; i++)
+                {
+                    result += "_";
+                }
 
             return result;
         }
