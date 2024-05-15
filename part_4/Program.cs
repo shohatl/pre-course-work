@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.Metadata;
 
 namespace _2048{
     public enum Direction
@@ -18,15 +19,24 @@ namespace _2048{
 
     public class Board
     {
-        protected int[,] Data = new int[4,4];
+        protected int[,] Data;
 
         public Board()
         {
-            for(int i = 0; i < 2; i++)
+            // for(int i = 0; i < 2; i++)
+            // {
+            //     this.AddPiece();
+            // }
+            this.Data = new int[4,4];
+            for(int i = 0; i < 4; i++)
             {
-                this.AddPiece();
+                this.Data[i,3] = 2;
             }
+
+            this.Data[1,2] = 4;
+            this.Data[1,0] = 2;
         }
+
         public int[,] GetData()
         {
             int[,] copy = new int[this.Data.GetLength(0), this.Data.GetLength(1)];
@@ -95,24 +105,38 @@ namespace _2048{
             
             return pieces;
         }
-        public void Move(Direction direction)
+        public int Move(Direction direction)
         {
+            int points = 0;
             switch (direction)
             {
                 case Direction.Up:
                     for (int x = 0; x < this.Data.GetLength(0); x++)
                     {
                         List<int> pieces = this.GetColumnPieces(x);
+                        
+                        int tempY = 0;
+                        while (tempY < pieces.Count - 1)
+                        {
+                            if (pieces[tempY] == pieces[tempY + 1])
+                            {
+                                pieces[tempY] += pieces[tempY + 1];
+                                points += pieces[tempY];
+                                pieces.RemoveAt(tempY + 1);
+                            }
+                            tempY++;
+                        }
+
                         for (int y = 0; y < this.Data.GetLength(1); y++)
                         {
-                            if (pieces.Count < y)
+                            if (y < pieces.Count)
                             {
-                                this.Data[x,y] = pieces[y];
+                                this.Data[x, y] = pieces[y];
                             }
 
                             else
                             {
-                                this.Data[x,y] = 0;
+                                this.Data[x, y] = 0;
                             }
                         }
                     }
@@ -122,16 +146,29 @@ namespace _2048{
                     for (int x = 0; x < this.Data.GetLength(0); x++)
                     {
                         List<int> pieces = this.GetColumnPieces(x);
+
+                        int tempY = 0;
+                        while (tempY < pieces.Count - 1)
+                        {
+                            if (pieces[pieces.Count - 1 -tempY] == pieces[pieces.Count - 2 -tempY])
+                            {
+                                pieces[pieces.Count - 1 -tempY] += pieces[pieces.Count - 2 -tempY];
+                                points += pieces[pieces.Count - 1 -tempY];
+                                pieces.RemoveAt(pieces.Count - 2 -tempY);
+                            }
+                            tempY++;
+                        }
+
                         for (int y = 0; y < this.Data.GetLength(1); y++)
                         {
-                            if (pieces.Count < y)
+                            if (y < pieces.Count)
                             {
-                                this.Data[x, y] = pieces[y];
+                                this.Data[x, this.Data.GetLength(1) - 1 - y] = pieces[y];
                             }
 
                             else
                             {
-                                this.Data[x, this.Data.GetLength(1) - y] = 0;
+                                this.Data[x, this.Data.GetLength(1) - 1 - y] = 0;
                             }
                         }
                     }
@@ -141,16 +178,29 @@ namespace _2048{
                     for (int y = 0; y < this.Data.GetLength(0); y++)
                     {
                         List<int> pieces = this.GetRowPieces(y);
+
+                        int tempX = 0;
+                        while (tempX < pieces.Count - 1)
+                        {
+                            if (pieces[pieces.Count - 1 -tempX] == pieces[pieces.Count - 2 -tempX])
+                            {
+                                pieces[pieces.Count - 1 -tempX] += pieces[pieces.Count - 2 -tempX];
+                                points += pieces[pieces.Count - 1 -tempX];
+                                pieces.RemoveAt(pieces.Count - 2 -tempX);
+                            }
+                            tempX++;
+                        }
+
                         for (int x = 0; x < this.Data.GetLength(0); x++)
                         {
-                            if (pieces.Count < x)
+                            if (x < pieces.Count)
                             {
-                                this.Data[x,y] = pieces[x];
+                                this.Data[this.Data.GetLength(0) - 1 - x, y] = pieces[x];
                             }
 
                             else
                             {
-                                this.Data[x,y] = 0;
+                                this.Data[this.Data.GetLength(0) - 1 - x ,y] = 0;
                             }
                         }
                     }
@@ -160,22 +210,36 @@ namespace _2048{
                     for (int y = 0; y < this.Data.GetLength(0); y++)
                     {
                         List<int> pieces = this.GetRowPieces(y);
+
+                        int tempX = 0;
+                        while (tempX < pieces.Count - 1)
+                        {
+                            if (pieces[tempX] == pieces[tempX + 1])
+                            {
+                                pieces[tempX] += pieces[tempX + 1];
+                                points += pieces[tempX];
+                                pieces.RemoveAt(tempX + 1);
+                            }
+                            tempX++;
+                        }
+
                         for (int x = 0; x < this.Data.GetLength(0); x++)
                         {
-                            if (pieces.Count < x)
+                            if (x < pieces.Count)
                             {
-                                this.Data[this.Data.GetLength(0) - x,y] = pieces[x];
+                                this.Data[x, y] = pieces[x];
                             }
 
                             else
                             {
-                                this.Data[x,y] = 0;
+                                this.Data[x, y] = 0;
                             }
                         }
                     }
                     break;
             }
             this.AddPiece();
+            return points;
         }
         
     }
@@ -184,7 +248,8 @@ namespace _2048{
         public static void Main()
         {
             Board test = new Board();
-            test.Move(Direction.Down);
+            Console.WriteLine(ArrayToString(test.GetData()));
+            Console.WriteLine($"got {test.Move(Direction.Right)} points");
             Console.WriteLine(ArrayToString(test.GetData()));
         }
         
@@ -192,11 +257,11 @@ namespace _2048{
         {
             string result = "";
 
-            for (int i = 0; i < array.GetLength(0); i++)
+            for (int y = 0; y < array.GetLength(1); y++)
             {
-                for (int j = 0; j < array.GetLength(1); j++)
+                for (int x = 0; x < array.GetLength(0); x++)
                 {
-                    result += array[i, j] + " ";
+                    result += array[x, y] + " ";
                 }
                 result += "\n";
             }
