@@ -72,6 +72,28 @@ namespace Question7
 
             return final;
         }
+
+        public static int SumLetters(int num)
+        {
+            int sum = 0;
+            for (int i = 0; i <= num; i++)
+            {
+                NumericalExpression expression = new NumericalExpression(i);
+                sum += expression.ToString().Replace(" ", "").Length;
+            }
+            return sum;
+        }
+
+        public static int SumLetters(NumericalExpression num)
+        {
+            int sum = 0;
+            for (int i = 0; i <= num.Num; i++)
+            {
+                NumericalExpression expression = new NumericalExpression(i);
+                sum += expression.ToString().Replace(" ", "").Length;
+            }
+            return sum;
+        }
     }
 
     public class Program
